@@ -29,3 +29,24 @@ test('handles missing fields on either side without crashing', () => {
   const changes = diffConfigs({}, { agentTeam: { depthCap: 3 } });
   assert.ok(changes.some((c) => c.path === 'agentTeam.depthCap'));
 });
+
+test('setByPath creates nested objects from a flat dotted path', () => {
+  const { setByPath } = require('./config-diff');
+  assert.deepEqual(setByPath({}, 'shield.secretScanner.allowlist', ['x']), {
+    shield: { secretScanner: { allowlist: ['x'] } },
+  });
+});
+
+test('setByPath overwrites a scalar leaf without disturbing siblings', () => {
+  const { setByPath } = require('./config-diff');
+  const obj = { agentTeam: { depthCap: 3, concurrentCap: 8 } };
+  setByPath(obj, 'agentTeam.depthCap', 5);
+  assert.deepEqual(obj, { agentTeam: { depthCap: 5, concurrentCap: 8 } });
+});
+
+test('setByPath replaces a non-object intermediate', () => {
+  const { setByPath } = require('./config-diff');
+  const obj = { traces: 'raw' };
+  setByPath(obj, 'traces.targetDir', 'zenno/traces');
+  assert.deepEqual(obj, { traces: { targetDir: 'zenno/traces' } });
+});

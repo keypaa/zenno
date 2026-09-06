@@ -34,4 +34,17 @@ function diffConfigs(currentConfig, importedConfig) {
   return changes;
 }
 
-module.exports = { diffConfigs, getByPath, KNOWN_PATHS };
+// Inverse of getByPath: materializes intermediate objects so callers can
+// build a config value from a dotted path without hand-rolling traversal.
+function setByPath(obj, pathStr, value) {
+  const keys = pathStr.split('.');
+  let node = obj;
+  for (const k of keys.slice(0, -1)) {
+    if (typeof node[k] !== 'object' || node[k] === null) node[k] = {};
+    node = node[k];
+  }
+  node[keys[keys.length - 1]] = value;
+  return obj;
+}
+
+module.exports = { diffConfigs, getByPath, setByPath, KNOWN_PATHS };
