@@ -3,6 +3,6 @@
   "version": "0.1.0",
   "type": "commonjs",
   "scripts": {
-    "test": "node --test core/hooks/*.test.js core/hooks/lib/*.test.js"
+    "test": "node --test core/hooks/*.test.js core/hooks/lib/*.test.js core/hooks/lib/test-support/*.test.js"
   }
 }
