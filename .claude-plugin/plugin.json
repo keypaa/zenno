@@ -3,7 +3,7 @@
   "description": "Security guards, disciplined multi-agent orchestration, and persistent memory for Claude Code",
   "version": "0.1.0",
   "author": {
-    "name": "TBD"
+    "name": "Keylhan Paumard--André"
   },
   "license": "MIT",
   "skills": "./core/skills",
