@@ -7,6 +7,5 @@
   },
   "license": "MIT",
   "skills": "./core/skills",
-  "agents": "./core/agents",
   "hooks": "./core/hooks/hooks.json"
 }

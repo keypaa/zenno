@@ -1,5 +1,6 @@
 {
   "name": "zenno-marketplace",
+  "description": "Zenno: security guards, disciplined multi-agent orchestration, and persistent memory for Claude Code",
   "owner": {
     "name": "TBD"
   },
