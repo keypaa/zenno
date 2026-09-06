@@ -107,6 +107,14 @@
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/core/hooks/lib/memory-promotion-sweep-hook.js\""
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/core/hooks/lib/cap-near-miss-hook.js\""
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [
@@ -127,6 +135,14 @@
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/core/hooks/lib/memory-promotion-sweep-hook.js\""
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/core/hooks/lib/cap-near-miss-hook.js\""
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -136,6 +152,15 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/core/hooks/lib/telemetry-hook.js\""
+          }
+        ]
+      },
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/core/hooks/lib/guard-warning-hook.js\""
           }
         ]
       }
