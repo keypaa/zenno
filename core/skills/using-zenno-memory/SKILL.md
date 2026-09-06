@@ -27,6 +27,10 @@ Unlike reading, writing is not automatic — a bare session-end hook has no way 
    ```
    Use this only for facts you're confident are durable and project-wide (e.g. "the API layer uses REST, not GraphQL"). This is the **explicit flagging** promotion mechanism — the other mechanism, cross-session corroboration, happens automatically when the same episodic note appears independently across 2+ sessions.
 
+## Doctor checks the memory repo too
+
+`zenno doctor` (see the running-zenno-doctor skill) verifies the snapshots dir and its private git repo exist and are readable. If it reports the snapshots dir without a git repo ("history lost"), do not re-init blindly — the history is unrecoverable and a fresh init would silently pretend otherwise.
+
 ## Important: corroboration is near-verbatim only, not semantic
 
 Cross-session promotion uses deterministic keyword-overlap matching, not real language understanding — it reliably catches the same fact restated in similar words across sessions, but will **not** recognize a genuine paraphrase that shares few literal words. If you want something to promote reliably regardless of how it's worded next time, use explicit `--semantic` flagging rather than relying on corroboration.
