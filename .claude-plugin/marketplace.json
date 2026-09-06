@@ -1,0 +1,13 @@
+{
+  "name": "zenno-marketplace",
+  "owner": {
+    "name": "TBD"
+  },
+  "plugins": [
+    {
+      "name": "zenno",
+      "source": "./",
+      "description": "Security guards, disciplined multi-agent orchestration, and persistent memory for Claude Code"
+    }
+  ]
+}

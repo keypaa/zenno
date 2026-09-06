@@ -1,0 +1,12 @@
+{
+  "name": "zenno",
+  "description": "Security guards, disciplined multi-agent orchestration, and persistent memory for Claude Code",
+  "version": "0.1.0",
+  "author": {
+    "name": "TBD"
+  },
+  "license": "MIT",
+  "skills": "./core/skills",
+  "agents": "./core/agents",
+  "hooks": "./core/hooks/hooks.json"
+}
