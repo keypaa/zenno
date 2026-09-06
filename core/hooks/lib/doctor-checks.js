@@ -16,15 +16,18 @@ function result(name, status, detail, fix) {
 
 // --- 1. Installation health ---------------------------------------------
 
+// Marker shape is the bootstrap contract (bootstrap.js writes
+// zenno/.initialized = { initializedAt: <ISO string> } only after all
+// steps succeed; a partial run leaves no marker, safe to retry).
 function checkBootstrapMarker(marker) {
-  if (!marker || marker.scaffolded !== true) {
+  if (!marker || typeof marker.initializedAt !== 'string') {
     return result(
       'bootstrap marker',
       WARN,
-      'zenno/.bootstrap.json is missing or has no scaffolded:true — bootstrap may not have run to completion'
+      'zenno/.initialized is missing or has no initializedAt timestamp — bootstrap may not have run to completion'
     );
   }
-  return result('bootstrap marker', OK, 'bootstrap completed (scaffolded:true)');
+  return result('bootstrap marker', OK, `bootstrap completed (initializedAt ${marker.initializedAt})`);
 }
 
 function checkConfigValidity(config, configErrors) {
@@ -50,29 +53,34 @@ function checkConfigValidity(config, configErrors) {
   return result('config.json validity', OK, 'parses and satisfies the config schema');
 }
 
+// The memory snapshot repo lives OUTSIDE the target repo, at
+// <memoryDir>/zenno/snapshots with its own private .git (init-memory-repo.js
+// — local-only git identity, never pushed). The CLI passes memory as
+// { snapshotsPath, rootExists, gitDirExists, gitOk } or null when no
+// memoryDir is configured for the repo at all.
 function checkMemoryRepo(memory) {
   if (!memory) {
     return result(
       'memory repo health',
       WARN,
-      'memory repo not initialized — run zenno-memory-init (see the using-zenno-memory skill)'
+      'no memory directory configured for this repo — bootstrap seeds one on next session start (see the using-zenno-memory skill)'
     );
   }
   if (memory.rootExists && !memory.gitDirExists) {
     return result(
       'memory repo health',
       FAIL,
-      'memory directory exists but its private git repo is missing — history lost, do not re-init blindly, see the using-zenno-memory skill'
+      `memory snapshots dir exists at ${memory.snapshotsPath} but its private git repo is missing — history lost, do not re-init blindly, see the using-zenno-memory skill`
     );
   }
   if (memory.gitDirExists && !memory.gitOk) {
     return result(
       'memory repo health',
       WARN,
-      'memory git repo exists but git status failed inside it — history may be unreadable'
+      'memory snapshots git repo exists but git status failed inside it — history may be unreadable'
     );
   }
-  return result('memory repo health', OK, 'memory directory and private git repo intact');
+  return result('memory repo health', OK, 'memory snapshots dir and private git repo intact');
 }
 
 function checkInstallHealth({ marker, config, configErrors, memory }) {

@@ -24,7 +24,7 @@ function goodMemory() {
 }
 
 function goodMarker() {
-  return { scaffolded: true };
+  return { initializedAt: '2026-09-06T00:00:00.000Z' };
 }
 
 function findCheck(checks, namePattern) {
@@ -39,8 +39,8 @@ test('null marker → WARN (bootstrap marker missing)', () => {
   assert.equal(c.status, 'WARN');
 });
 
-test('marker without scaffolded:true → WARN', () => {
-  const checks = checkInstallHealth({ marker: { scaffolded: false }, config: validConfig(), configErrors: null, memory: goodMemory() });
+test('marker without an initializedAt timestamp → WARN', () => {
+  const checks = checkInstallHealth({ marker: { initializedAt: 123 }, config: validConfig(), configErrors: null, memory: goodMemory() });
   const c = findCheck(checks, /bootstrap/i);
   assert.equal(c.status, 'WARN');
 });
@@ -75,11 +75,11 @@ test('schema-invalid config (depthCap "three") → FAIL naming depthCap with imp
   assert.match(c.fix, /config-import-cli/);
 });
 
-test('memory null → WARN (not initialized)', () => {
+test('memory null → WARN (no memory directory configured)', () => {
   const checks = checkInstallHealth({ marker: goodMarker(), config: validConfig(), configErrors: null, memory: null });
   const c = findCheck(checks, /memory/i);
   assert.equal(c.status, 'WARN');
-  assert.match(c.detail, /not initialized/i);
+  assert.match(c.detail, /no memory directory configured/i);
 });
 
 test('memory root without .git → FAIL (history lost, do not re-init blindly)', () => {
