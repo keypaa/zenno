@@ -266,9 +266,22 @@ function stripFixtureKeys(payload) {
 // Sanity: the five guard hooks are run against their payload pairs.
 // The Agent Team block case needs a config with depthCap 0 in the repo —
 // callers that cannot provide one pass skipAgentTeamBlock=true.
+// Every doctor run creates throwaway sandbox repos under the temp dir.
+// They are removed again at the end of the run: a SessionStart nudge that
+// leaks a git repo per session would fill the disk within weeks.
+function removeDir(dir) {
+  try {
+    fs.rmSync(dir, { recursive: true, force: true });
+  } catch {
+    // best effort — a leftover temp dir is untidy, not incorrect
+  }
+}
+
 function runHookChecks(hooksJson, pluginRoot, repoRoot, payloads, options = {}) {
   const checks = [];
+  const sandboxDirs = [];
   const sandboxDir = setupGitSandbox();
+  sandboxDirs.push(sandboxDir);
   for (const [event, groups] of Object.entries(hooksJson.hooks || {})) {
     for (const group of groups) {
       for (const hook of group.hooks || []) {
@@ -321,6 +334,7 @@ function runHookChecks(hooksJson, pluginRoot, repoRoot, payloads, options = {}) 
       // zenno/config.json (pure-local rule — no network involved).
       const benign = { ...stripFixtureKeys(spec.benign), cwd: sandboxDir };
       const blockSandbox = doctorMkdtemp('zenno-doctor-block-');
+      sandboxDirs.push(blockSandbox);
       fs.mkdirSync(path.join(blockSandbox, 'zenno'), { recursive: true });
       fs.writeFileSync(
         path.join(blockSandbox, 'zenno', 'config.json'),
@@ -353,6 +367,9 @@ function runHookChecks(hooksJson, pluginRoot, repoRoot, payloads, options = {}) 
       continue;
     }
     checks.push(...runSingleSanity({ name: spec.name, hookPath, argv, benign: spec.benign, blocking: spec.blocking, sandboxDir }));
+  }
+  for (const dir of sandboxDirs) {
+    removeDir(dir);
   }
   return checks;
 }
