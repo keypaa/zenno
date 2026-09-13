@@ -64,23 +64,42 @@ On the next session start in any repo, bootstrap runs automatically (creates `ze
 
 ### opencode
 
-Same repo, different host — the `opencode/` overlay reuses `core/` at `permission.ask` and other hooks so the same guards fire:
+Same repo, different host — the `opencode/` overlay reuses `core/` at `permission.ask` and other hooks so the same guards fire.
+
+Add zenno to your `opencode.json`:
 
 ```json
-// opencode.json
 {
   "$schema": "https://opencode.ai/config.json",
   "plugin": ["keypaa/zenno/opencode/plugin.ts"]
 }
 ```
 
-Or locally while developing the overlay:
+Local development (clone + relative path):
 
 ```json
 { "plugin": ["./opencode/plugin.ts"] }
 ```
 
-Requires [opencode](https://opencode.ai) ≥ 1.18 (via `mise install opencode` or the standalone installer).
+Install the `opencode` binary via `mise` (recommended — pins per-project):
+
+```bash
+mise install opencode
+mise which opencode         # → ~/.local/share/mise/installs/opencode/latest/opencode
+mise where opencode         # → ~/.local/share/mise/installs/opencode/1.18.30 (actual version dir)
+```
+
+Or the standalone installer. Requires [opencode](https://opencode.ai) ≥ 1.18.
+
+Zenno exposes the same 8 tools on opencode (doctor, cost-report, memory, graph, trace-export, config export/import, bounded-research, plan-stress-test) — same `core/` implementations, same `zenno/` repo artifacts (config, journal, doctor-nudge on session start).
+
+<details>
+<summary>Troubleshooting</summary>
+
+- **Plugin not loaded** — confirm `plugin` points at the real path (`./opencode/plugin.ts` locally, or the git path) and that your `opencode.json` `$schema` is `https://opencode.ai/config.json`.
+- **Doctor nudge on every start** — `zenno doctor` (the 30+ check suite) explains each `WARN`/`FAIL`; fixes are `zenno/config.json` edits or `run zenno doctor for details`.
+- **Blocked tool incorrectly** — paste the exact tool name + input + the `Zenno … Guard: blocked` message; the allowlist lives in `zenno/config.json` (`shield.secretScanner.allowlist`, `confidentialFileGuard.allowPatterns`, etc.).
+</details>
 
 ## Updating
 
