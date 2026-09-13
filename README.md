@@ -1,8 +1,8 @@
 # Zenno
 
-Security guards, disciplined multi-agent orchestration, and persistent memory for Claude Code.
+Security guards, disciplined multi-agent orchestration, and persistent memory — for Claude Code and [opencode](https://opencode.ai).
 
-Zenno is a Claude Code plugin that watches what agents do and keeps them honest: four Shield guards block secret leaks, confidential-file reads, risky installs, and self-modification of Zenno itself; hard caps stop runaway subagent fan-out; a memory layer carries project knowledge across sessions; and a doctor, cost tracker, and trace exporter keep the whole thing observable.
+Zenno watches what agents do and keeps them honest: four Shield guards block secret leaks, confidential-file reads, risky installs, and self-modification of Zenno itself; hard caps stop runaway subagent fan-out; a memory layer carries project knowledge across sessions; and a doctor, cost tracker, and trace exporter keep the whole thing observable. One `core/` powers both hosts — pick your editor.
 
 - **432 tests, all passing** (`npm test` — pure Node.js, zero dependencies)
 - MIT licensed, by Keylhan Paumard--André
@@ -49,6 +49,8 @@ sudo apt install ripgrep universal-ctags git
 
 ## Installation
 
+### Claude Code
+
 Add the marketplace, then install the plugin (user scope by default):
 
 ```
@@ -60,7 +62,29 @@ If it reports `Run /reload-plugins to activate`, run `/reload-plugins`. Verify u
 
 On the next session start in any repo, bootstrap runs automatically (creates `zenno/.initialized` + `zenno/config.json` plus memory scaffolding). To contain the blast radius while evaluating, install with **project scope** instead of user scope.
 
+### opencode
+
+Same repo, different host — the `opencode/` overlay reuses `core/` at `permission.ask` and other hooks so the same guards fire:
+
+```json
+// opencode.json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": ["keypaa/zenno/opencode/plugin.ts"]
+}
+```
+
+Or locally while developing the overlay:
+
+```json
+{ "plugin": ["./opencode/plugin.ts"] }
+```
+
+Requires [opencode](https://opencode.ai) ≥ 1.18 (via `mise install opencode` or the standalone installer).
+
 ## Updating
+
+### Claude Code
 
 Refresh the marketplace catalog, then reload:
 
@@ -71,7 +95,13 @@ Refresh the marketplace catalog, then reload:
 
 Third-party marketplaces have background auto-update **off** by default; you can enable it per marketplace under `/plugin` → **Marketplaces**. Either way, the running session keeps its loaded versions until you reload or restart.
 
+### opencode
+
+Managed by your package/install step. If installed from `opencode.json` via a git path, `opencode` re-resolves on next launch. For local development, changes to `opencode/plugin.ts` are picked up on restart.
+
 ## Removing
+
+### Claude Code
 
 Uninstall the plugin (keeps the marketplace catalog):
 
@@ -86,6 +116,10 @@ To also drop the catalog (this removes anything installed from it):
 ```
 
 Uninstalling leaves your repos' `zenno/` directories and `~/.claude/projects/` memory data in place — delete those manually if you want a full purge.
+
+### opencode
+
+Remove the `plugin` entry from `opencode.json` that points at zenno. Same cleanup note: `zenno/` dirs and memory data are yours to keep or delete.
 
 ## Usage
 
