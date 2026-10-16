@@ -64,21 +64,21 @@ On the next session start in any repo, bootstrap runs automatically (creates `ze
 
 ### opencode
 
-Same repo, different host — the `opencode/` overlay reuses `core/` at `permission.ask` and other hooks so the same guards fire.
+Same repo, different host — the `opencode/` overlay reuses `core/` so the same guards fire. Works with **opencode v2** (native `Plugin.define` entrypoint; on 1.18.29+ the guards and lifecycle hooks still load, tools need v2).
 
-Add zenno to your `opencode.json`:
+Add zenno to your `opencode.json` (global `~/.config/opencode/opencode.json` or project-local):
 
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugin": ["keypaa/zenno/opencode/plugin.ts"]
+  "plugins": ["zenno@git+https://github.com/keypaa/zenno.git"]
 }
 ```
 
-Local development (clone + relative path):
+Local development (clone + directory path — v2 requires a directory, not a file):
 
 ```json
-{ "plugin": ["./opencode/plugin.ts"] }
+{ "plugins": ["./opencode"] }
 ```
 
 Install the `opencode` binary via `mise` (recommended — pins per-project):
@@ -89,14 +89,14 @@ mise which opencode         # → ~/.local/share/mise/installs/opencode/latest/o
 mise where opencode         # → ~/.local/share/mise/installs/opencode/1.18.30 (actual version dir)
 ```
 
-Or the standalone installer. Requires [opencode](https://opencode.ai) ≥ 1.18.
+Or the standalone installer. Requires [opencode](https://opencode.ai) ≥ 2.0 (guards also load on 1.18.29+, minus the tools).
 
 Zenno exposes the same 8 tools on opencode (doctor, cost-report, memory, graph, trace-export, config export/import, bounded-research, plan-stress-test) — same `core/` implementations, same `zenno/` repo artifacts (config, journal, doctor-nudge on session start).
 
 <details>
 <summary>Troubleshooting</summary>
 
-- **Plugin not loaded** — confirm `plugin` points at the real path (`./opencode/plugin.ts` locally, or the git path) and that your `opencode.json` `$schema` is `https://opencode.ai/config.json`.
+- **Plugin not loaded** — confirm `plugins` points at the git spec (`zenno@git+https://github.com/keypaa/zenno.git`) or a local directory (`./opencode`), and that your `opencode.json` `$schema` is `https://opencode.ai/config.json`. Bare `owner/repo/path` shortcuts are not valid specs.
 - **Doctor nudge on every start** — `zenno doctor` (the 30+ check suite) explains each `WARN`/`FAIL`; fixes are `zenno/config.json` edits or `run zenno doctor for details`.
 - **Blocked tool incorrectly** — paste the exact tool name + input + the `Zenno … Guard: blocked` message; the allowlist lives in `zenno/config.json` (`shield.secretScanner.allowlist`, `confidentialFileGuard.allowPatterns`, etc.).
 </details>
@@ -116,7 +116,7 @@ Third-party marketplaces have background auto-update **off** by default; you can
 
 ### opencode
 
-Managed by your package/install step. If installed from `opencode.json` via a git path, `opencode` re-resolves on next launch. For local development, changes to `opencode/plugin.ts` are picked up on restart.
+Installed from git: `opencode plugin update zenno@git+https://github.com/keypaa/zenno.git` (unpinned git plugins are checked on startup; run the update to pull). For local development, changes to `opencode/` are picked up on restart.
 
 ## Removing
 
@@ -138,7 +138,7 @@ Uninstalling leaves your repos' `zenno/` directories and `~/.claude/projects/` m
 
 ### opencode
 
-Remove the `plugin` entry from `opencode.json` that points at zenno. Same cleanup note: `zenno/` dirs and memory data are yours to keep or delete.
+Remove the `plugins` entry from `opencode.json` that points at zenno. Same cleanup note: `zenno/` dirs and memory data are yours to keep or delete.
 
 ## Usage
 
