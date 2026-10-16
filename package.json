@@ -2,6 +2,10 @@
   "name": "zenno",
   "version": "0.1.0",
   "type": "commonjs",
+  "main": "./opencode/plugin.ts",
+  "dependencies": {
+    "@opencode/plugin": "2.0.30"
+  },
   "scripts": {
     "test": "node --test core/hooks/*.test.js core/hooks/lib/*.test.js core/hooks/lib/test-support/*.test.js"
   }
